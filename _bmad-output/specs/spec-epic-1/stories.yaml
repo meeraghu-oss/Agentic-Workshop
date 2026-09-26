@@ -1,0 +1,10 @@
+- id: "1"
+  title: Triage decision schema
+  description: >-
+    Implement and test CAP-1 so triage decisions accept only the supported
+    category, priority, route, and one-sentence rationale shape, with clear errors for invalid decisions.
+- id: "2"
+  title: Repeatable seed data loader
+  description: >-
+    Implement and test CAP-2 so uv run python load_seed.py creates the MCP-compatible
+    app.db from the read-only seed CSVs and repeated runs leave the same data.
