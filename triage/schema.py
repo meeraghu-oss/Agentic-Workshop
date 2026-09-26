@@ -10,13 +10,13 @@ Category = Literal["billing", "bug", "access", "performance", "how-to"]
 Priority = Literal["P1", "P2", "P3", "P4"]
 Route = Literal["billing-team", "bug-team", "access-team", "performance-team", "how-to-team"]
 
-_SENTENCE_BREAK = re.compile(r"[.!?]\s+\S")
+_SENTENCE_BREAK = re.compile(r"[.!?](?:\s+\S|(?=\S))")
 
 
 class TriageDecision(BaseModel):
     """Where a support ticket goes, how urgent it is, and why."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     category: Category = Field(description="The ticket's category from the triage policy.")
     priority: Priority = Field(description="P1 is the most urgent, P4 the least.")

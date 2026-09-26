@@ -36,3 +36,17 @@ context:
 - `low` (rejected) — Python's JSON parser resolves duplicate object keys to the final value; duplicate-key detection is outside the contract, uncommon for generated decisions, and would complicate parsing for negligible benefit.
 - `low` (patched) — positive tests covered only one enum member; parameterized coverage now exercises all supported category, priority, and route values. The suggested pairing assertion was rejected because pairing is intentionally out of scope.
 - `low` (deferred) — the pre-existing untracked `.DS_Store` can be accidentally added, but repository ignore hygiene predates this story; recorded in `_bmad-output/implementation-artifacts/deferred-work.md`.
+
+### Review Findings
+
+- [x] [Review][Patch] Rationale validator accepts sentence breaks without whitespace [triage/schema.py:13]
+- [x] [Review][Patch] Dict validation coerces bytes into rationale strings [triage/schema.py:19]
+- [x] [Review][Patch] Non-object validation tests do not assert clear error messages [tests/test_schema.py:62]
+
+#### Rejected
+
+- [Review][Rejected][false] Package root does not re-export schema API — the story explicitly names `triage.schema` as the public API module, and current callers/tests import from `triage.schema`.
+- [Review][Rejected][low] Abbreviation-shaped single sentences can be rejected — real for examples like `Inc. reports`, but rare in policy rationales and fixing it would add disproportionate sentence parsing complexity.
+- [Review][Rejected][false] Category and route should be paired — the story review log and CAP-1 keep category and route as independent supported enums; pairing belongs to policy logic outside this story.
+- [Review][Rejected][false] Dict input is broader than a JSON-only contract — the story explicitly requires a helper that accepts dictionaries or JSON, so accepting dicts is intended.
+- [Review][Rejected][low] Duplicate JSON keys are silently resolved by `json.loads` — real, but uncommon for generated decisions and fixing it would add custom parsing complexity beyond the current story contract.

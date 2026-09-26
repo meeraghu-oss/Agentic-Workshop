@@ -44,6 +44,8 @@ def test_accepts_every_supported_enum_value(field, value):
         ({"route": "finance-team"}, "route"),
         ({"rationale": "   "}, "rationale"),
         ({"rationale": "First sentence. Second sentence."}, "rationale"),
+        ({"rationale": "First sentence.Second sentence."}, "rationale"),
+        ({"rationale": b"A double charge is a money problem."}, "rationale"),
         ({"extra": "field"}, "extra"),
     ],
 )
@@ -59,9 +61,17 @@ def test_rejects_a_missing_field(field):
         validate_decision(payload)
 
 
-@pytest.mark.parametrize("payload", ["not json", b"\x80\x81", "[1, 2]", "42"])
-def test_rejects_non_objects(payload):
-    with pytest.raises(TriageValidationError):
+@pytest.mark.parametrize(
+    "payload, message",
+    [
+        ("not json", "not valid JSON"),
+        (b"\x80\x81", "not valid JSON"),
+        ("[1, 2]", "Decision must be a JSON object, got list"),
+        ("42", "Decision must be a JSON object, got int"),
+    ],
+)
+def test_rejects_non_objects(payload, message):
+    with pytest.raises(TriageValidationError, match=message):
         validate_decision(payload)
 
 
