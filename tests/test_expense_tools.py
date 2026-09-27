@@ -72,3 +72,9 @@ def test_record_decision_rejects_invalid_storage_values(tmp_path, monkeypatch):
         record_decision("L-3001", "maybe", "2.3")
     with pytest.raises(ValueError, match="Clause"):
         record_decision("L-3001", "approve", " ")
+
+
+def test_record_decision_stores_explanation(tmp_path, monkeypatch):
+    monkeypatch.setattr(tools, "DECISIONS_DB_PATH", tmp_path / "expense.db")
+    result = record_decision("L-test", "approve", "2.1", "Within the daily meal limit.")
+    assert result["explanation"] == "Within the daily meal limit."
