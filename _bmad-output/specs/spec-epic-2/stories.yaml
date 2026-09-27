@@ -1,13 +1,15 @@
 - id: "1"
-  title: The triage agent
+  title: Implement policy precedence decisions
   description: >-
-    Build the create_agent-based agent covering CAP-1 through CAP-4 and CAP-6:
-    the Gemini/Groq provider switch, tool-grounded lookup via mcp/triage_server.py,
-    TRIAGE_POLICY.md-driven structured output with retry-once-then-error, and
-    ignoring instructions embedded in ticket text.
+    Add a policy decision engine that assigns approve, flag, or reject to each
+    line item using POLICY.md precedence and Case A claim context.
 - id: "2"
-  title: Human-gated escalation
+  title: Validate decisions and clauses against labelled examples
   description: >-
-    Add the escalate_to_human tool and LangChain human-in-the-loop approval gate
-    (CAP-5): the policy's P1+Enterprise rule pauses the run for a terminal yes/no,
-    and nothing escalates without a yes.
+    Use cases/expense/eval/labelled.csv to verify evaluated line items match
+    expected decisions and deciding clauses.
+- id: "3"
+  title: Record explainable claim review decisions
+  description: >-
+    Add a claim-review workflow that records each line item decision through
+    record_decision and returns short explanations for reviewer inspection.
