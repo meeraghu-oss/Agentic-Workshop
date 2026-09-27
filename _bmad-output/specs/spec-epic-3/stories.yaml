@@ -1,15 +1,10 @@
 - id: "1"
-  title: The eval run and the four code scorers
+  title: Build the reviewer decision table and total
   description: >-
-    Build eval/run_eval.py: drive the Epic 2 agent over all 20 tickets in
-    eval/labelled_tickets.csv via mlflow.genai.evaluate, logging one run to
-    the triage-agent experiment (CAP-1). Wire up valid_schema, category_match,
-    priority_match, and tool_order (CAP-2 through CAP-5), and auto-approve
-    every escalation so the run never waits on a person (CAP-8).
+    Extend claim review results with amount, approved-only reimbursable total,
+    and visible rejected and flagged line items.
 - id: "2"
-  title: The rationale judge and the report
+  title: Add human release status for high-value approvals
   description: >-
-    Add the rationale_judge scorer, calling ChatGroq with JUDGE_MODEL/GROQ_API_KEY
-    and never GEMINI_API_KEY (CAP-6). Print the mean of all five scorers, the
-    agent's total tokens, and the escalation count, and write the same numbers
-    to eval/latest_report.json (CAP-7).
+    Mark approved items over $500 as requiring human release while keeping them
+    approved and preventing any automatic payout release.
