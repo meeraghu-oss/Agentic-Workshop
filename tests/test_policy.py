@@ -1,6 +1,6 @@
 import csv
 
-from expense.policy import decide_claim
+from expense.policy import decide_claim, validate_labelled_examples
 from expense.tools import get_claim
 
 
@@ -19,3 +19,7 @@ def test_labelled_examples_match_policy_decisions_and_clauses():
         or actual[row["line_id"]]["clause"] != row["expected_clause"]
     ]
     assert mismatches == []
+
+
+def test_labelled_validator_returns_no_mismatches():
+    assert validate_labelled_examples() == []

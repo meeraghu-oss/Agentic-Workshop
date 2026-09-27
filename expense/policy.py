@@ -1,8 +1,9 @@
 """Read-only Case A policy evaluation for individual expense line items."""
 
+import csv
 from datetime import date
 
-from .tools import _read_csv, get_employee, get_policy_limits
+from .tools import _read_csv, get_claim, get_employee, get_policy_limits
 
 
 PRECEDENCE = ("3.1", "3.2", "3.3", "5.1", "1.2", "4.1", "limits", "1.3")
@@ -88,4 +89,26 @@ def decide_claim(claim: dict, employee: dict | None = None) -> list[dict[str, st
     return [
         {"line_id": item["line_id"], **decide_line_item(item, claim, employee)}
         for item in claim["line_items"]
+    ]
+
+
+def validate_labelled_examples(path: str = "cases/expense/eval/labelled.csv") -> list[dict[str, str]]:
+    """Return mismatches instead of hiding labelled-example failures in a test."""
+    with open(path, newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    claims = {row["claim_id"]: get_claim(row["claim_id"]) for row in rows}
+    actual = {
+        result["line_id"]: result
+        for claim in claims.values()
+        for result in decide_claim(claim)
+    }
+    return [
+        {
+            **row,
+            "actual_decision": actual[row["line_id"]]["decision"],
+            "actual_clause": actual[row["line_id"]]["clause"],
+        }
+        for row in rows
+        if actual[row["line_id"]]["decision"] != row["expected_decision"]
+        or actual[row["line_id"]]["clause"] != row["expected_clause"]
     ]
