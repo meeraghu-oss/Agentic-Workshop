@@ -1,0 +1,15 @@
+- id: "1"
+  title: Add Case A data and labelled examples
+  description: >-
+    Make the Case A expense seed CSVs and eval labelled.csv available at the
+    expected paths so context tooling and acceptance tests have stable inputs.
+- id: "2"
+  title: Implement claim context lookup tools
+  description: >-
+    Implement get_claim, get_employee, and get_policy_limits over the available
+    Case A data so CAP-1 can retrieve complete claim context from a claim_id.
+- id: "3"
+  title: Implement decision recording contract
+  description: >-
+    Implement record_decision as the storage contract for later epics while
+    keeping policy decisions, clause citation, totals, and payout behavior out of scope.
