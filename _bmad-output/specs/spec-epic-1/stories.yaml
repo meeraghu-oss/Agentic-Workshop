@@ -1,10 +1,15 @@
 - id: "1"
-  title: Triage decision schema
+  title: Add Case A data and labelled examples
   description: >-
-    Implement and test CAP-1 so triage decisions accept only the supported
-    category, priority, route, and one-sentence rationale shape, with clear errors for invalid decisions.
+    Make the Case A expense seed CSVs and eval labelled.csv available at the
+    expected paths so context tooling and acceptance tests have stable inputs.
 - id: "2"
-  title: Repeatable seed data loader
+  title: Implement claim context lookup tools
   description: >-
-    Implement and test CAP-2 so uv run python load_seed.py creates the MCP-compatible
-    app.db from the read-only seed CSVs and repeated runs leave the same data.
+    Implement get_claim, get_employee, and get_policy_limits over the available
+    Case A data so CAP-1 can retrieve complete claim context from a claim_id.
+- id: "3"
+  title: Implement decision recording contract
+  description: >-
+    Implement record_decision as the storage contract for later epics while
+    keeping policy decisions, clause citation, totals, and payout behavior out of scope.
