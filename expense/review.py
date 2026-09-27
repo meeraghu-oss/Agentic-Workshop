@@ -18,7 +18,11 @@ def review_claim(claim_id: str) -> list[dict[str, str]]:
     for result in decide_claim(claim):
         explanation = _explanation(result)
         item = next(item for item in claim["line_items"] if item["line_id"] == result["line_id"])
-        rows.append({**record_decision(**result, explanation=explanation), "amount": item["amount"]})
+        rows.append({
+            **record_decision(**result, explanation=explanation),
+            "amount": item["amount"],
+            "requires_human_release": result["decision"] == "approve" and item["amount"] > 500,
+        })
     return rows
 
 
