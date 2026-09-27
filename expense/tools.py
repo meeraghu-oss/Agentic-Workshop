@@ -1,10 +1,14 @@
 """CSV-backed context lookup tools for Case A expense claims."""
 
 import csv
+import sqlite3
 from pathlib import Path
 
 
+ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = Path(__file__).resolve().parent.parent / "cases" / "expense" / "seed"
+DECISIONS_DB_PATH = ROOT / "expense.db"
+DECISIONS = {"approve", "flag", "reject"}
 
 
 def _read_csv(name: str) -> list[dict[str, str]]:
@@ -60,3 +64,36 @@ def get_policy_limits(level: str, city: str) -> dict[str, float]:
     if not limits:
         raise ValueError(f"No policy limits for {level} in {city}")
     return limits
+
+
+def record_decision(line_id: str, decision: str, clause: str) -> dict[str, str]:
+    """Write one line item decision for later reviewer inspection."""
+    if not line_id.strip():
+        raise ValueError("Line ID is required")
+    if decision not in DECISIONS:
+        raise ValueError(f"Decision must be one of {sorted(DECISIONS)}")
+    if not clause.strip():
+        raise ValueError("Clause is required")
+
+    with sqlite3.connect(DECISIONS_DB_PATH) as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS decisions (
+                line_id TEXT PRIMARY KEY,
+                decision TEXT NOT NULL,
+                clause TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO decisions (line_id, decision, clause)
+            VALUES (?, ?, ?)
+            ON CONFLICT(line_id) DO UPDATE SET
+                decision = excluded.decision,
+                clause = excluded.clause
+            """,
+            (line_id, decision, clause),
+        )
+        conn.commit()
+    return {"line_id": line_id, "decision": decision, "clause": clause}
