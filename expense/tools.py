@@ -66,7 +66,7 @@ def get_policy_limits(level: str, city: str) -> dict[str, float]:
     return limits
 
 
-def record_decision(line_id: str, decision: str, clause: str) -> dict[str, str]:
+def record_decision(line_id: str, decision: str, clause: str, explanation: str = "") -> dict[str, str]:
     """Write one line item decision for later reviewer inspection."""
     if not line_id.strip():
         raise ValueError("Line ID is required")
@@ -81,19 +81,27 @@ def record_decision(line_id: str, decision: str, clause: str) -> dict[str, str]:
             CREATE TABLE IF NOT EXISTS decisions (
                 line_id TEXT PRIMARY KEY,
                 decision TEXT NOT NULL,
-                clause TEXT NOT NULL
+                clause TEXT NOT NULL,
+                explanation TEXT NOT NULL DEFAULT ''
             )
             """
         )
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(decisions)")}
+        if "explanation" not in columns:
+            conn.execute("ALTER TABLE decisions ADD COLUMN explanation TEXT NOT NULL DEFAULT ''")
         conn.execute(
             """
-            INSERT INTO decisions (line_id, decision, clause)
-            VALUES (?, ?, ?)
+            INSERT INTO decisions (line_id, decision, clause, explanation)
+            VALUES (?, ?, ?, ?)
             ON CONFLICT(line_id) DO UPDATE SET
                 decision = excluded.decision,
-                clause = excluded.clause
+                clause = excluded.clause,
+                explanation = excluded.explanation
             """,
-            (line_id, decision, clause),
+            (line_id, decision, clause, explanation),
         )
         conn.commit()
-    return {"line_id": line_id, "decision": decision, "clause": clause}
+    result = {"line_id": line_id, "decision": decision, "clause": clause}
+    if explanation:
+        result["explanation"] = explanation
+    return result
