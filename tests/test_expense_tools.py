@@ -1,6 +1,7 @@
 import pytest
 
-from expense.tools import get_claim, get_employee, get_policy_limits
+from expense import tools
+from expense.tools import get_claim, get_employee, get_policy_limits, record_decision
 
 
 def test_get_claim_returns_employee_id_and_line_items():
@@ -42,3 +43,32 @@ def test_get_policy_limits_returns_category_limits():
 def test_lookup_tools_raise_clear_errors_for_missing_context(lookup):
     with pytest.raises(ValueError, match="No .*"):
         lookup()
+
+
+def test_record_decision_writes_and_updates_one_line_item(tmp_path, monkeypatch):
+    db_path = tmp_path / "expense.db"
+    monkeypatch.setattr(tools, "DECISIONS_DB_PATH", db_path)
+
+    assert record_decision("L-3001", "approve", "2.3") == {
+        "line_id": "L-3001",
+        "decision": "approve",
+        "clause": "2.3",
+    }
+    assert record_decision("L-3001", "flag", "1.3")["decision"] == "flag"
+
+    import sqlite3
+
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute("SELECT line_id, decision, clause FROM decisions").fetchall()
+    assert rows == [("L-3001", "flag", "1.3")]
+
+
+def test_record_decision_rejects_invalid_storage_values(tmp_path, monkeypatch):
+    monkeypatch.setattr(tools, "DECISIONS_DB_PATH", tmp_path / "expense.db")
+
+    with pytest.raises(ValueError, match="Line ID"):
+        record_decision(" ", "approve", "2.3")
+    with pytest.raises(ValueError, match="Decision"):
+        record_decision("L-3001", "maybe", "2.3")
+    with pytest.raises(ValueError, match="Clause"):
+        record_decision("L-3001", "approve", " ")

@@ -3,6 +3,7 @@
 __pycache__/
 .pytest_cache/
 app.db
+expense.db
 mlflow.db
 mlruns/
 eval/latest_report.json
